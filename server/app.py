@@ -10,14 +10,14 @@ from routes.GenerateTrends import GenerateTrends
 app = flask.Flask(__name__)
 
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # Initialize the Gen AI client using the key from .env
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 # Initialize Supabase client
-supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_KEY")
+supabase_url = os.getenv("VITE_SUPABASE_URL")
+supabase_key = os.getenv("VITE_SUPABASE_ANON_KEY")
 supabase = create_client(supabase_url, supabase_key)
 
 
