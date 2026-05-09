@@ -20,6 +20,17 @@ Instead of relying on assumptions or geography-based allocation, EquiWork enable
 
 ---
 
+# 🔑 Demo HR Credentials
+
+Use the following credentials to access the HR dashboard for demo/testing purposes:
+
+```text id="jz9m4o"
+Email: hashim@gmail.com
+Password: 123456
+```
+
+---
+
 # ✨ Core Features
 
 ## 👤 AI Employee Evaluation
@@ -51,8 +62,8 @@ The system automatically:
 
 1. Fetches all employee profiles
 2. Recalculates scores using AI
-3. Updates Supabase records
-4. Refreshes dashboards instantly
+3. Updates records instantly
+4. Refreshes dashboards dynamically
 
 ---
 
@@ -98,19 +109,23 @@ EquiWork solves these challenges through:
 
 ---
 
-# 🏗️ System Architecture
 
-```text
+# 🏗️ System Workflow
+
+```text id="h0k5ga"
 Employee Registration
         │
         ▼
-Frontend → Supabase → Evaluation API
-        │                  │
-        │                  ▼
-        │          AI Score + Review
-        │                  │
-        ▼                  ▼
- Employee Dashboard ← Updated Database
+Frontend → Evaluation API
+        │
+        ▼
+AI Score + Review Generation
+        │
+        ▼
+Database Update
+        │
+        ▼
+Employee & HR Dashboards
 ```
 
 ---
@@ -122,15 +137,14 @@ Frontend → Supabase → Evaluation API
 ### Flow
 
 1. Employee signs up
-2. Profile is created in Supabase
+2. Employee profile is created
 3. Frontend triggers Evaluation API
-4. API calculates:
+4. AI calculates:
 
-   * AI Score
+   * Market Fit Score
    * AI Review
    * Grade Level
-5. API directly updates Supabase
-6. Dashboard fetches updated data
+5. Dashboard fetches updated data automatically
 
 ### Evaluation Inputs
 
@@ -159,85 +173,26 @@ The HR dashboard integrates with the **Market Trends API** to display:
 
 HR clicks:
 
-```text
+```text id="7xw7gg"
 Generate Trends
 ```
 
 ### Example Prompt
 
-```text
+```text id="odjlwm"
 Focus on AI, Cloud Infrastructure, and Cybersecurity
 ```
 
 ### Process
 
 * Frontend sends prompt to Evaluation API
-* API fetches all employees
-* Scores are recalculated
-* Supabase updates automatically
-* Dashboard refreshes with new rankings
-
----
-
-# 🗄️ Database Schema (Supabase)
-
-## `profiles`
-
-Core employee information.
-
-| Field              | Description                   |
-| ------------------ | ----------------------------- |
-| `id`               | Linked to Supabase Auth       |
-| `role`             | employee / hr / admin         |
-| `score`            | AI-generated market fit score |
-| `review`           | AI-generated review           |
-| `experience_years` | Total experience              |
-| `skills`           | Employee skill set            |
-| `burnout_risk`     | Burnout indicator             |
-
----
-
-## `market_trends`
-
-Stores market intelligence data.
-
-| Field         | Description       |
-| ------------- | ----------------- |
-| `metric_name` | Trend metric      |
-| `value`       | Metric value      |
-| `category`    | Industry category |
-| `source_api`  | Data source       |
-
----
-
-## `grade_history`
-
-Tracks employee growth over time.
-
-| Field            | Description        |
-| ---------------- | ------------------ |
-| `employee_id`    | Employee reference |
-| `previous_grade` | Previous grade     |
-| `new_grade`      | Updated grade      |
-| `timestamp`      | Change time        |
-
----
-
-## `upskilling_recommendations`
-
-Stores AI-generated roadmaps.
-
-| Field             | Description      |
-| ----------------- | ---------------- |
-| `roadmap_details` | Learning roadmap |
-| `target_skills`   | Required skills  |
-| `status`          | Progress status  |
+* All employees are re-evaluated
+* Scores are recalculated dynamically
+* Dashboard refreshes with updated rankings
 
 ---
 
 # 🔒 Security & Access Control
-
-Implemented using **Supabase Row Level Security (RLS)**.
 
 ## Employees
 
@@ -247,7 +202,7 @@ Can access:
 * AI score
 * Reviews
 * Roadmaps
-* Grade history
+* Growth history
 
 ---
 
@@ -340,7 +295,7 @@ Reduce unnecessary lateral hiring through intelligent reskilling.
 
 ## Clone Repository
 
-```bash
+```bash id="mjlwm0"
 git clone https://github.com/your-username/equiwork.git
 cd equiwork
 ```
@@ -349,7 +304,7 @@ cd equiwork
 
 ## Install Dependencies
 
-```bash
+```bash id="ax2r8n"
 npm install
 ```
 
@@ -359,7 +314,7 @@ npm install
 
 Create a `.env` file:
 
-```env
+```env id="omjlwm"
 SUPABASE_URL=your_supabase_url
 SUPABASE_ANON_KEY=your_supabase_key
 EVALUATION_API_URL=your_api
@@ -370,7 +325,7 @@ MARKET_TRENDS_API_URL=your_api
 
 ## Run Development Server
 
-```bash
+```bash id="6nax9m"
 npm run dev
 ```
 
