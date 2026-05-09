@@ -6,8 +6,8 @@ def GenerateSkills(app, client, supabase):
 
     @app.route('/generate-skills', methods=['POST'])
     def generate_skills():
-        description = request.json.get('description')
-        market_skills = generateNewSkills(client, description)
+        # description = request.json.get('description')
+        market_skills = generateNewSkills(client)
         
         # Update market_skills table with new skills
         # Delete all existing skills

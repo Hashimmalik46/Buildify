@@ -28,7 +28,7 @@ Example structure:
 """
 
 
-def generateNewSkills(client,description):
+def generateNewSkills(client):
     try:
         # 3. Execute the API Call
         response = client.models.generate_content(
