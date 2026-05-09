@@ -2,53 +2,60 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Mail, Lock } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
+import { supabase } from '../lib/supabase';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [role, setRole] = useState('employee');
-  const [email, setEmail] = useState('john.doe@equiwork.ai');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleRoleChange = (newRole) => {
-    setRole(newRole);
-    setEmail(newRole === 'hr' ? 'admin@equiwork.ai' : 'john.doe@equiwork.ai');
-  };
-
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (role === 'hr') {
-      navigate('/hr/dashboard');
-    } else {
-      navigate('/employee/dashboard');
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) throw signInError;
+
+      // Fetch user profile to check role
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      if (profile.role === 'hr' || profile.role === 'admin') {
+        navigate('/hr/dashboard');
+      } else {
+        navigate('/employee/dashboard');
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <AuthLayout>
       <div className="animate-fade-in">
-        <h1 style={{ fontSize: '36px', marginBottom: '12px' }}>Welcome back</h1>
+        <h1 style={{ fontSize: '36px', marginBottom: '12px' }}>Login to EquiWork</h1>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '40px', fontSize: '16px' }}>
           Enter your credentials to access the EquiWork Portal.
         </p>
 
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
-          <div style={{ display: 'flex', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px', padding: '4px' }}>
-            <button 
-              type="button"
-              onClick={() => handleRoleChange('employee')}
-              style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: role === 'employee' ? 'var(--accent-blue)' : 'transparent', color: role === 'employee' ? 'white' : 'var(--text-secondary)', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
-            >
-              Employee
-            </button>
-            <button 
-              type="button"
-              onClick={() => handleRoleChange('hr')}
-              style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: role === 'hr' ? 'var(--accent-blue)' : 'transparent', color: role === 'hr' ? 'white' : 'var(--text-secondary)', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
-            >
-              HR Admin
-            </button>
-          </div>
 
           <div className="input-group">
             <label className="input-label">Email Address</label>
@@ -90,8 +97,10 @@ const Login = () => {
             <label htmlFor="remember" style={{ color: 'var(--text-secondary)', fontSize: '14px', cursor: 'pointer' }}>Remember me</label>
           </div>
 
-          <button type="submit" className="btn-primary mt-4">
-            Sign In to Portal
+          {error && <div style={{ color: '#ef4444', fontSize: '14px' }}>{error}</div>}
+
+          <button type="submit" className="btn-primary mt-4" disabled={loading}>
+            {loading ? 'Signing In...' : 'Sign In to Portal'}
             <ArrowRight size={20} />
           </button>
         </form>

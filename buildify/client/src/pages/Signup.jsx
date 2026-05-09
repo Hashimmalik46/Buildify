@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowLeft, Briefcase, UserCircle, Code, Shield, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Briefcase, UserCircle, Code, Shield, CheckCircle2, Lock } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
+import { supabase } from '../lib/supabase';
 
 const StepIndicator = ({ currentStep, totalSteps }) => {
   return (
@@ -29,10 +30,14 @@ const Signup = () => {
     firstName: '',
     lastName: '',
     email: '',
+    password: '',
     role: '',
     skills: [],
-    bio: ''
+    bio: '',
+    experienceYears: 0
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const nextStep = () => setStep(prev => Math.min(prev + 1, 4));
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
@@ -44,6 +49,52 @@ const Signup = () => {
         ? prev.skills.filter(s => s !== skill)
         : [...prev.skills, skill]
     }));
+  };
+
+  // Dummy function for AI Score (will be replaced by API endpoint)
+  const calculateInitialScore = () => {
+    // Generate a random market fit score between 5.0 and 9.5
+    const score = (Math.random() * (9.5 - 5.0) + 5.0).toFixed(2);
+    // Grade level is simply rounding the score
+    const grade = Math.round(score);
+    return { marketFitScore: parseFloat(score), gradeLevel: grade };
+  };
+
+  const handleSignup = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const aiScores = calculateInitialScore();
+      
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            role: 'employee', // Defaulting to employee for signups, HR could be invited or set manually
+            experienceYears: formData.experienceYears,
+            marketFitScore: aiScores.marketFitScore,
+            gradeLevel: aiScores.gradeLevel,
+            department: formData.role, // The UI calls 'department' 'role'
+            skills: formData.skills,
+            bio: formData.bio
+          }
+        }
+      });
+
+      if (signUpError) throw signUpError;
+
+      // Upon success, redirect to login or dashboard
+      navigate('/login', { state: { message: 'Registration successful! Please sign in.' } });
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const roles = [
@@ -104,7 +155,7 @@ const Signup = () => {
               </div>
             </div>
 
-            <div className="input-group mb-6">
+            <div className="input-group mb-4">
               <label className="input-label">Email Address</label>
               <input 
                 type="email" 
@@ -112,6 +163,17 @@ const Signup = () => {
                 placeholder="name@company.com"
                 value={formData.email}
                 onChange={e => setFormData({...formData, email: e.target.value})}
+              />
+            </div>
+
+            <div className="input-group mb-6">
+              <label className="input-label">Password</label>
+              <input 
+                type="password" 
+                className="glass-input w-full" 
+                placeholder="Create a strong password"
+                value={formData.password}
+                onChange={e => setFormData({...formData, password: e.target.value})}
               />
             </div>
 
@@ -206,8 +268,20 @@ const Signup = () => {
           <div>
             <h1 style={{ fontSize: '32px', marginBottom: '12px' }}>Profile Completion</h1>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '40px' }}>
-              Almost there! Add a brief bio to complete your profile.
+              Almost there! Add your experience and a brief bio.
             </p>
+
+            <div className="input-group mb-4">
+              <label className="input-label">Years of Experience</label>
+              <input 
+                type="number" 
+                className="glass-input w-full" 
+                placeholder="e.g., 3"
+                min="0"
+                value={formData.experienceYears}
+                onChange={e => setFormData({...formData, experienceYears: parseInt(e.target.value) || 0})}
+              />
+            </div>
 
             <div className="input-group mb-8">
               <label className="input-label">Professional Bio</label>
@@ -221,8 +295,10 @@ const Signup = () => {
               />
             </div>
 
-            <button onClick={() => navigate('/login')} className="btn-primary">
-              Complete Setup <CheckCircle2 size={20} />
+            {error && <div style={{ color: '#ef4444', marginBottom: '16px', fontSize: '14px' }}>{error}</div>}
+
+            <button onClick={handleSignup} className="btn-primary" disabled={loading}>
+              {loading ? 'Creating Account...' : 'Complete Setup'} <CheckCircle2 size={20} />
             </button>
           </div>
         )}

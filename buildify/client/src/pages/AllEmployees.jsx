@@ -1,13 +1,29 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, Filter, Download, MoreVertical } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 const AllEmployees = () => {
-  const employees = [
-    { id: 'EQ-001', name: 'John Doe', branch: 'US', dept: 'Engineering', score: 95, burnout: 'Low' },
-    { id: 'EQ-002', name: 'Jane Smith', branch: 'Kashmir', dept: 'Design', score: 88, burnout: 'High' },
-    { id: 'EQ-003', name: 'Mike Johnson', branch: 'US', dept: 'Product', score: 92, burnout: 'Medium' },
-    { id: 'EQ-004', name: 'Sarah Wilson', branch: 'Kashmir', dept: 'Engineering', score: 85, burnout: 'Low' },
-  ];
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .neq('role', 'hr')
+        .neq('role', 'admin');
+      
+      if (error) {
+        console.error('Error fetching employees:', error);
+      } else {
+        setEmployees(data);
+      }
+      setLoading(false);
+    };
+
+    fetchEmployees();
+  }, []);
 
   return (
     <div className="animate-fade-in">
@@ -38,9 +54,11 @@ const AllEmployees = () => {
           </button>
         </div>
 
-        {/* Table */}
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>Loading employee data...</div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
                 <th style={{ padding: '16px', color: 'var(--text-secondary)', fontWeight: 500 }}>Employee</th>
@@ -57,22 +75,22 @@ const AllEmployees = () => {
                   <td style={{ padding: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--accent-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>
-                        {emp.name.charAt(0)}
+                        {emp.first_name?.charAt(0)}
                       </div>
                       <div>
-                        <div style={{ fontWeight: 500 }}>{emp.name}</div>
-                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{emp.id}</div>
+                        <div style={{ fontWeight: 500 }}>{emp.first_name} {emp.last_name}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{emp.id.substring(0, 8)}</div>
                       </div>
                     </div>
                   </td>
-                  <td style={{ padding: '16px' }}>{emp.branch}</td>
-                  <td style={{ padding: '16px' }}>{emp.dept}</td>
+                  <td style={{ padding: '16px' }}>{emp.branch || 'Global'}</td>
+                  <td style={{ padding: '16px' }}>{emp.department || 'N/A'}</td>
                   <td style={{ padding: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div style={{ width: '60px', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px' }}>
-                        <div style={{ width: `${emp.score}%`, height: '100%', background: 'var(--accent-blue)', borderRadius: '3px' }}></div>
+                        <div style={{ width: `${emp.performance_score || 0}%`, height: '100%', background: 'var(--accent-blue)', borderRadius: '3px' }}></div>
                       </div>
-                      <span style={{ fontSize: '14px' }}>{emp.score}</span>
+                      <span style={{ fontSize: '14px' }}>{emp.performance_score || 0}</span>
                     </div>
                   </td>
                   <td style={{ padding: '16px' }}>
@@ -92,8 +110,9 @@ const AllEmployees = () => {
                 </tr>
               ))}
             </tbody>
-          </table>
-        </div>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
