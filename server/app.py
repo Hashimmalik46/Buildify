@@ -11,9 +11,19 @@ app = flask.Flask(__name__)
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
+# Render/Linux env vars are case-sensitive, so support both common variants.
+groq_api_key = (
+    os.getenv("GROQ_API_KEY")
+)
+
+if not groq_api_key:
+    raise RuntimeError(
+        "Missing Groq API key. Set GROQ_API_KEY in your environment or Render dashboard."
+    )
+
 # Initialize the Groq OpenAI-compatible client using the key from .env
 client = OpenAI(
-    api_key=os.getenv("GROQ_API_KEY"),
+    api_key=groq_api_key,
     base_url="https://api.groq.com/openai/v1",
 )
 
