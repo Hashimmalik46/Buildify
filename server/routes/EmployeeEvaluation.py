@@ -13,9 +13,8 @@ def EmployeeEvaluation(app, client):
     
     @app.route('/employees-evaluation', methods=['POST'])
     def employees_evaluation():
-        employee_ids = request.json.get('employee_ids')
+        employee_ids = [1,2,3,4,5]
         evaluations = []
         for emp_id in employee_ids:
-            evaluation = evaluateEmployee(emp_id)
             evaluations.append(evaluation)
         return jsonify(evaluations)

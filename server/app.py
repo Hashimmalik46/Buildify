@@ -74,6 +74,6 @@ GenerateSkills(app,client)
 
 
 if __name__ == "__main__":
-    # app.run(debug=True)
+    app.run(debug=True)
 
-    evaluate_candidate()
+    # evaluate_candidate()
