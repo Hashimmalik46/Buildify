@@ -16,5 +16,6 @@ def EmployeeEvaluation(app, client):
         employee_ids = [1,2,3,4,5]
         evaluations = []
         for emp_id in employee_ids:
+            evaluation = evaluateEmployee(client,emp_id)
             evaluations.append(evaluation)
         return jsonify(evaluations)
