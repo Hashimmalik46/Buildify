@@ -5,7 +5,7 @@ from google import genai
 from supabase import create_client
 import flask
 from routes.EmployeeEvaluation import EmployeeEvaluation
-from routes.GenerateTrends import GenerateTrends
+from routes.GenerateSkills import GenerateSkills
 
 app = flask.Flask(__name__)
 
@@ -22,7 +22,7 @@ supabase = create_client(supabase_url, supabase_key)
 
 
 EmployeeEvaluation(app,client,supabase)
-GenerateTrends(app,client,supabase)
+GenerateSkills(app,client,supabase)
 
 
 if __name__ == "__main__":
