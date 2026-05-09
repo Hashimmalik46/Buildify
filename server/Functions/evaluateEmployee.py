@@ -1,4 +1,16 @@
-def evaluateEmployee(employee_id):
+import json
+import os
+
+def load_local_json(file_path):
+    """Utility to load JSON data from a local file."""
+    try:
+        with open(file_path, 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Error loading {file_path}: {e}")
+        return None
+
+def evaluateEmployee(client, employee_id):
     # 1. Load employee data
     employee_data = load_local_json('employee.json')
     if not employee_data:
@@ -17,7 +29,7 @@ def evaluateEmployee(employee_id):
     # This linking ensures the AI compares specific fields directly
     context = {
         "candidate": employee_data,
-        "company_needs": company_constraints
+        "company_needs": company_consts
     }
 
     # 4. Generate the structured score

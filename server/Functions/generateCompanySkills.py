@@ -17,7 +17,7 @@ Constraints:
 
 user_instruction = "Generate the Top 15 mastery skills report for my software services firm."
 
-def generate_strategic_report(client):
+def generateCompanySkills(client):
     try:
         # 3. Execute the API Call
         response = client.models.generate_content(

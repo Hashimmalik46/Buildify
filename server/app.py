@@ -2,6 +2,11 @@ import json
 import os
 from dotenv import load_dotenv
 from google import genai
+import flask
+from routes.EmployeeEvaluation import EmployeeEvaluation
+from routes.GenerateSkills import GenerateSkills
+
+app = flask.Flask(__name__)
 
 
 load_dotenv()
@@ -37,7 +42,7 @@ def evaluate_candidate():
     # This linking ensures the AI compares specific fields directly
     context = {
         "candidate": employee_data,
-        "company_needs": company_constraints
+        "company_needs": company_consts
     }
 
     # 4. Generate the structured score
@@ -63,5 +68,8 @@ def evaluate_candidate():
     except Exception as e:
         print(f"An error occurred during API call: {e}")
 
+    EmployeeEvaluation(app,client)
+    GenerateSkills(app,client)
+
 if __name__ == "__main__":
-    evaluate_candidate()
+    app.run(debug=True)
