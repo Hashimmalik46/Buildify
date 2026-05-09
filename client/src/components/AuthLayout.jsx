@@ -40,7 +40,7 @@ const AuthLayout = ({ children }) => {
           <div className="text-center" style={{ maxWidth: '400px' }}>
             <h2 style={{ fontSize: '32px', marginBottom: '16px' }} className="text-gradient">Intelligence at Work</h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '16px', lineHeight: '1.6' }}>
-              Connect with the world's leading AI-driven talent network. Optimize your productivity and bridge the gap between potential and execution.
+              Connect with an AI-driven talent network that aligns skills, market shifts, and workforce growth into one clear operating picture.
             </p>
           </div>
         </div>

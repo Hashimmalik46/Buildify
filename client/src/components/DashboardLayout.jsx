@@ -5,7 +5,6 @@ import {
   Users, 
   Briefcase, 
   LineChart, 
-  Settings, 
   LogOut,
   UserCircle,
   Award,
@@ -22,15 +21,14 @@ const DashboardLayout = ({ role = 'employee' }) => {
     { to: '/employee/profile', icon: <UserCircle size={20} />, label: 'My Profile' },
     { to: '/employee/skills', icon: <Award size={20} />, label: 'Skill Analysis' },
     { to: '/employee/experience', icon: <Clock size={20} />, label: 'Experience' },
-    { to: '/employee/projects', icon: <Briefcase size={20} />, label: 'Assigned Projects' },
   ];
 
   const hrLinks = [
     { to: '/hr/dashboard', icon: <LayoutDashboard size={20} />, label: 'HR Dashboard' },
     { to: '/hr/employees', icon: <Users size={20} />, label: 'All Employees' },
     { to: '/hr/trends', icon: <LineChart size={20} />, label: 'Trends Analytics' },
+    { to: '/hr/roadmaps', icon: <Network size={20} />, label: 'Roadmaps' },
     { to: '/hr/projects/add', icon: <PlusCircle size={20} />, label: 'Add Project' },
-    { to: '/hr/projects/assign', icon: <Network size={20} />, label: 'Assign Projects' },
   ];
 
   const links = role === 'hr' ? hrLinks : employeeLinks;

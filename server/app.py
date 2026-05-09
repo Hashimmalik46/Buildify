@@ -1,7 +1,6 @@
-import json
 import os
 from dotenv import load_dotenv
-from google import genai
+from openai import OpenAI
 from supabase import create_client
 import flask
 from routes.EmployeeEvaluation import EmployeeEvaluation
@@ -12,13 +11,18 @@ app = flask.Flask(__name__)
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
-# Initialize the Gen AI client using the key from .env
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+# Initialize the Groq OpenAI-compatible client using the key from .env
+client = OpenAI(
+    api_key=os.getenv("GROQ_API_KEY"),
+    base_url="https://api.groq.com/openai/v1",
+)
 
 # Initialize Supabase client
 supabase_url = os.getenv("VITE_SUPABASE_URL")
-supabase_key = os.getenv("VITE_SUPABASE_ANON_KEY")
+supabase_service_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_SECRET_KEY")
+supabase_key = supabase_service_key or os.getenv("VITE_SUPABASE_ANON_KEY")
 supabase = create_client(supabase_url, supabase_key)
+app.config["SUPABASE_HAS_SERVICE_ROLE"] = bool(supabase_service_key)
 
 
 EmployeeEvaluation(app,client,supabase)

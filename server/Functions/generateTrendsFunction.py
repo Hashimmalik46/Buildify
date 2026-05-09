@@ -1,6 +1,19 @@
 import json
+import os
+
+MODEL_NAME = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
 
 
+def _parse_json_response(response):
+    raw_text = (response.output_text or "").strip()
+    if raw_text.startswith("```"):
+        parts = raw_text.split("```")
+        if len(parts) >= 2:
+            raw_text = parts[1]
+            if raw_text.startswith("json"):
+                raw_text = raw_text[4:]
+            raw_text = raw_text.strip()
+    return json.loads(raw_text)
 
 
 def generateNewTrends(client,description):
@@ -10,34 +23,31 @@ Core Objective: Identify the 15 most critical skills for our company based on th
 description: {description}
 
 RESPONSE FORMAT:
-Return a JSON object with a "skills" array containing exactly 15 items. Each item MUST have exactly these three fields:
+Return a JSON object with a "trends" array containing exactly 15 items. Each item MUST have exactly these three fields:
 - metric_name: (string) The name of the skill
 - value: (number 1-100) Priority/weight of the skill (100 being highest priority)
 - category: (string) Category it belongs to.
 
 Example structure:
 
+{{
   "trends": [
-    "metric_name": "Agent Orchestration", "value": 95, "category": "Emerging Tech",
-    "metric_name": "Cloud Architecture", "value": 85, "category": "Durable Foundations"
+    {{"metric_name": "Agent Orchestration", "value": 95, "category": "Emerging Tech"}},
+    {{"metric_name": "Cloud Architecture", "value": 85, "category": "Durable Foundations"}}
   ]
+}}
 """
     try:
-        # 3. Execute the API Call
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=["Generate the Top 15 mastery skills report for my software services firm.",
+        response = client.responses.create(
+            model=MODEL_NAME,
+            input=(
+                "Generate a market trends report for our workforce planning system. "
+                "Return ONLY valid JSON matching the requested schema. "
                 f"Input Data: {json.dumps(system_prompt)}"
-            ],
-            config={
-                "response_mime_type": "application/json"
-            }
+            ),
         )
 
-        # 4. Output the Result
-        # print("--- Top 15 mastery skills report for 2026 ---")
-        response = json.loads(response.text)
-        # print(json.dumps(evaluation, indent=4))
+        response = _parse_json_response(response)
         return response
     except Exception as e:
         print(f"An error occurred: {e}")

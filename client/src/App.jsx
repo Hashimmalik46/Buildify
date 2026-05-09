@@ -8,6 +8,8 @@ import EmployeeProfile from './pages/EmployeeProfile';
 import HRDashboard from './pages/HRDashboard';
 import AllEmployees from './pages/AllEmployees';
 import SkeletonPage from './pages/SkeletonPage';
+import TrendsAnalytics from './pages/TrendsAnalytics';
+import HRRoadmaps from './pages/HRRoadmaps';
 import './index.css';
 
 function App() {
@@ -24,16 +26,15 @@ function App() {
           <Route path="profile" element={<EmployeeProfile />} />
           <Route path="skills" element={<SkeletonPage title="Skill Analysis" description="Analyze categorized technical and soft skills, circular skill progress charts, AI skill gap analysis widget." />} />
           <Route path="experience" element={<SkeletonPage title="Experience Timeline" description="Vertical career timeline, project history cards, technologies used, promotions." />} />
-          <Route path="projects" element={<SkeletonPage title="Assigned Projects" description="Project cards with title, progress bar, deadlines, and skill requirements." />} />
         </Route>
 
         {/* HR Routes */}
         <Route path="/hr" element={<DashboardLayout role="hr" />}>
           <Route path="dashboard" element={<HRDashboard />} />
           <Route path="employees" element={<AllEmployees />} />
-          <Route path="trends" element={<SkeletonPage title="Trends Analytics" description="Workforce trend graphs, demand forecasting, attrition prediction." />} />
+          <Route path="trends" element={<TrendsAnalytics />} />
+          <Route path="roadmaps" element={<HRRoadmaps />} />
           <Route path="projects/add" element={<SkeletonPage title="Add Project" description="Create a new enterprise project and set required skills." />} />
-          <Route path="projects/assign" element={<SkeletonPage title="Assign Projects" description="AI-assisted project assignment with employee recommendations and workload balancing." />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -5,6 +5,7 @@ def EmployeeEvaluation(app, client, supabase):
 
     #signup/skillchange
     @app.route('/employee-evaluation', methods=['POST'])
+    @app.route('/api/employee-evaluation', methods=['POST'])
     def employee_evaluation():
         employee_id = request.json.get('employee_id')
         if not employee_id:

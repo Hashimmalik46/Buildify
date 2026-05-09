@@ -38,6 +38,7 @@ const Signup = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [customSkill, setCustomSkill] = useState('');
 
   const nextStep = () => setStep(prev => Math.min(prev + 1, 4));
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
@@ -49,6 +50,19 @@ const Signup = () => {
         ? prev.skills.filter(s => s !== skill)
         : [...prev.skills, skill]
     }));
+  };
+
+  const addCustomSkill = () => {
+    const normalizedSkill = customSkill.trim();
+    if (!normalizedSkill) return;
+
+    setFormData(prev => ({
+      ...prev,
+      skills: prev.skills.includes(normalizedSkill)
+        ? prev.skills
+        : [...prev.skills, normalizedSkill]
+    }));
+    setCustomSkill('');
   };
 
   const handleSignup = async () => {
@@ -105,7 +119,7 @@ const Signup = () => {
     { id: 'security', icon: <Shield />, title: 'Security', desc: 'Cyber, Compliance, Risk' }
   ];
 
-  const availableSkills = ['React', 'Node.js', 'Python', 'AWS', 'Figma', 'TypeScript', 'GraphQL', 'Docker'];
+  const availableSkills = ['React', 'Node.js', 'Python', 'Cloud', 'UI/UX', 'Leadership', 'AWS', 'Figma', 'TypeScript', 'GraphQL', 'Docker'];
 
   return (
     <AuthLayout>
@@ -231,6 +245,29 @@ const Signup = () => {
               Select your core competencies to match with AI opportunities.
             </p>
 
+            <div className="glass-panel" style={{ padding: '20px', marginBottom: '24px' }}>
+              <label className="input-label" style={{ display: 'block', marginBottom: '10px' }}>Add a custom skill</label>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  className="glass-input"
+                  style={{ flex: 1 }}
+                  placeholder="e.g., Prompt Engineering"
+                  value={customSkill}
+                  onChange={e => setCustomSkill(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addCustomSkill();
+                    }
+                  }}
+                />
+                <button type="button" className="btn-secondary" style={{ width: 'auto', whiteSpace: 'nowrap' }} onClick={addCustomSkill}>
+                  Add Skill
+                </button>
+              </div>
+            </div>
+
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '40px' }}>
               {availableSkills.map(skill => {
                 const isSelected = formData.skills.includes(skill);
@@ -257,6 +294,34 @@ const Signup = () => {
                 );
               })}
             </div>
+
+            {formData.skills.length > 0 && (
+              <div style={{ marginBottom: '32px' }}>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '12px', fontSize: '14px' }}>Selected skills</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                  {formData.skills.map(skill => (
+                    <div
+                      key={skill}
+                      onClick={() => toggleSkill(skill)}
+                      style={{
+                        padding: '10px 16px',
+                        borderRadius: '30px',
+                        background: 'rgba(0,210,255,0.1)',
+                        border: '1px solid var(--accent-blue)',
+                        color: 'var(--accent-blue)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <CheckCircle2 size={16} />
+                      {skill}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <button onClick={nextStep} className="btn-primary">
               Continue <ArrowRight size={20} />
