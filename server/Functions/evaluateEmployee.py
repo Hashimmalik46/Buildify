@@ -5,10 +5,10 @@ def evaluateEmployee(client, employee_id):
     # 1. Load employee data
     employee_data = {
     "name": "suhail",
-    "skills": ["Python", "Flask", "Tailwind CSS", "PostgreSQL"],
+    "skills": ["Python", "PostgreSQL"],
     "experience_years": 4,
     "collaborative_spirit": "High (Experience leading small agile teams)"
-}
+    }
 
     # 2. Define company constraints
     company_consts = {
@@ -26,14 +26,12 @@ def evaluateEmployee(client, employee_id):
         "company_needs": company_consts
     }
 
-    # 4. Generate the structured score
-    # Setting response_mime_type ensures valid JSON output
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3-flash",
             contents=[
-                "Analyze the candidate against the company needs. "
-                "Provide a match_score (0-100), a breakdown of skill alignment, "
+                "Analyze the candidate against the company needs and  what the candidate needs to improve. "
+                "Provide a match_score (0-100) based on comparing with the company needs, a breakdown of skill alignment, "
                 "and an assessment of their collaborative spirit.",
                 f"Input Data: {json.dumps(context)}"
             ],

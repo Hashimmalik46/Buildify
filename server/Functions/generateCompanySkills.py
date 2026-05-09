@@ -1,7 +1,5 @@
 import json
-import os
 
-# 2. Define the Balanced Architecture Prompt
 system_prompt = """
 Role: You are a CTO-level Strategic Consultant. 
 Core Objective: Identify the 15 most critical technical skills for a software engineering team in 2026. 
@@ -15,20 +13,15 @@ Constraints:
 5. Anti-Hype Filter: Avoid "Prompt Engineering"; use "Context Engineering" or "Agent Orchestration."
 """
 
-user_instruction = "Generate the Top 15 mastery skills report for my software services firm."
 
 def generateCompanySkills(client):
     try:
         # 3. Execute the API Call
         response = client.models.generate_content(
             model="gemini-2.5-flash",
-            contents=user_instruction,
-            # config=types.GenerateContentConfig(
-            #     system_instruction=system_prompt,
-            #     temperature=0.2,  # Low temperature for stable, expert output
-            #     max_output_tokens=2048,
-            #     top_p=0.8
-            # )
+            contents=["Generate the Top 15 mastery skills report for my software services firm.",
+                f"Input Data: {json.dumps(system_prompt)}"
+            ],
             config={
                 "response_mime_type": "application/json"
             }
