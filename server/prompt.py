@@ -1,9 +1,14 @@
+import json
 import os
 from google import genai
 from google.genai import types
+from dotenv import load_dotenv
+
 
 # 1. Setup Configuration
-API_KEY = "YOUR_GEMINI_API_KEY" # Replace with your actual key
+load_dotenv()
+
+API_KEY = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=API_KEY)
 
 # 2. Define the Balanced Architecture Prompt
@@ -26,19 +31,23 @@ def generate_strategic_report():
     try:
         # 3. Execute the API Call
         response = client.models.generate_content(
-            model="gemini-3-flash",
+            model="gemini-2.5-flash",
             contents=user_instruction,
-            config=types.GenerateContentConfig(
-                system_instruction=system_prompt,
-                temperature=0.2,  # Low temperature for stable, expert output
-                max_output_tokens=2048,
-                top_p=0.8
-            )
+            # config=types.GenerateContentConfig(
+            #     system_instruction=system_prompt,
+            #     temperature=0.2,  # Low temperature for stable, expert output
+            #     max_output_tokens=2048,
+            #     top_p=0.8
+            # )
+            config={
+                "response_mime_type": "application/json"
+            }
         )
 
         # 4. Output the Result
-        print("--- STRATEGIC WORKFORCE REPORT 2026 ---")
-        print(response.text)
+        print("--- Top 15 mastery skills report for 2026 ---")
+        evaluation = json.loads(response.text)
+        print(json.dumps(evaluation, indent=4))
 
     except Exception as e:
         print(f"An error occurred: {e}")
