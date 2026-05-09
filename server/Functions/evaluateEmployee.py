@@ -1,20 +1,14 @@
 import json
 import os
 
-def load_local_json(file_path):
-    """Utility to load JSON data from a local file."""
-    try:
-        with open(file_path, 'r') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        print(f"Error loading {file_path}: {e}")
-        return None
-
 def evaluateEmployee(client, employee_id):
     # 1. Load employee data
-    employee_data = load_local_json('employee.json')
-    if not employee_data:
-        return
+    employee_data = {
+    "name": "suhail",
+    "skills": ["Python", "Flask", "Tailwind CSS", "PostgreSQL"],
+    "experience_years": 4,
+    "collaborative_spirit": "High (Experience leading small agile teams)"
+}
 
     # 2. Define company constraints
     company_consts = {
@@ -50,7 +44,7 @@ def evaluateEmployee(client, employee_id):
 
         # 5. Parse and Print the result
         evaluation = json.loads(response.text)
-        print(json.dumps(evaluation, indent=4))
+        return evaluation
 
     except Exception as e:
         print(f"An error occurred during API call: {e}")

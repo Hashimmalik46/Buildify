@@ -5,6 +5,7 @@ from google import genai
 import flask
 from routes.EmployeeEvaluation import EmployeeEvaluation
 from routes.GenerateSkills import GenerateSkills
+from Functions.generateCompanySkills import generateCompanySkills
 
 app = flask.Flask(__name__)
 
@@ -68,8 +69,11 @@ def evaluate_candidate():
     except Exception as e:
         print(f"An error occurred during API call: {e}")
 
-    EmployeeEvaluation(app,client)
-    GenerateSkills(app,client)
+EmployeeEvaluation(app,client)
+GenerateSkills(app,client)
+
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # app.run(debug=True)
+
+    evaluate_candidate()

@@ -35,8 +35,9 @@ def generateCompanySkills(client):
         )
 
         # 4. Output the Result
-        print("--- Top 15 mastery skills report for 2026 ---")
+        # print("--- Top 15 mastery skills report for 2026 ---")
         evaluation = json.loads(response.text)
-        print(json.dumps(evaluation, indent=4))
+        # print(json.dumps(evaluation, indent=4))
+        return evaluation
     except Exception as e:
         print(f"An error occurred: {e}")
