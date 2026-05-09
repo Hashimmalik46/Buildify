@@ -51,20 +51,11 @@ const Signup = () => {
     }));
   };
 
-  // Dummy function for AI Score (will be replaced by API endpoint)
-  const calculateInitialScore = () => {
-    // Generate a random score between 50 and 95 (out of 100)
-    const score = (Math.random() * (95 - 50) + 50).toFixed(0);
-    return { score: parseInt(score), review: "Initial profile assessment pending deep AI analysis." };
-  };
-
   const handleSignup = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      const aiScores = calculateInitialScore();
-      
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -74,8 +65,6 @@ const Signup = () => {
             lastName: formData.lastName,
             role: 'employee', // Defaulting to employee for signups, HR could be invited or set manually
             experienceYears: formData.experienceYears,
-            score: aiScores.score,
-            review: aiScores.review,
             department: formData.role, // The UI calls 'department' 'role'
             skills: formData.skills,
             bio: formData.bio
@@ -84,6 +73,20 @@ const Signup = () => {
       });
 
       if (signUpError) throw signUpError;
+
+      // After successful signup, call the Evaluation API to set score and review
+      const userId = data.user?.id;
+      if (userId) {
+        try {
+          await fetch('/api/employee-evaluation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ employee_id: userId })
+          });
+        } catch (apiErr) {
+          console.error("Evaluation API error:", apiErr);
+        }
+      }
 
       // Upon success, redirect to login or dashboard
       navigate('/login', { state: { message: 'Registration successful! Please sign in.' } });

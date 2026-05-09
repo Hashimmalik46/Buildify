@@ -1,8 +1,68 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, TrendingUp, AlertCircle, FileCheck, Map, Activity, BarChart2 } from 'lucide-react';
 import { PerformanceChart } from '../components/Charts';
+import { supabase } from '../lib/supabase';
 
 const HRDashboard = () => {
+  const [loadingTrends, setLoadingTrends] = useState(false);
+  const [stats, setStats] = useState({
+    totalEmployees: 0,
+    avgProductivity: 0,
+    burnoutAlerts: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const { data, error } = await supabase.from('profiles').select('*');
+        if (data && !error) {
+          const employees = data.filter(p => p.role === 'employee');
+          const totalEmployees = employees.length;
+          const totalScore = employees.reduce((sum, emp) => sum + (emp.score || 0), 0);
+          const avgProductivity = totalEmployees > 0 ? Math.round(totalScore / totalEmployees) : 0;
+          const burnoutAlerts = employees.filter(emp => emp.burnout_risk === 'High').length;
+          
+          setStats({
+            totalEmployees,
+            avgProductivity,
+            burnoutAlerts,
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching HR stats:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const handleGenerateTrends = async () => {
+    const description = prompt("Enter current industry priorities for generating trends:");
+    if (!description) return;
+    
+    setLoadingTrends(true);
+    try {
+      const res = await fetch('/api/generate-trends', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description })
+      });
+      const data = await res.json();
+      alert(data.message || "Trends generated successfully!");
+      // Re-fetch stats after updating
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert("Error generating trends.");
+    } finally {
+      setLoadingTrends(false);
+    }
+  };
+
+  if (loading) return <div className="animate-fade-in"><p>Loading dashboard...</p></div>;
+
   return (
     <div className="animate-fade-in">
       <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -10,15 +70,17 @@ const HRDashboard = () => {
           <h1 style={{ fontSize: '32px', marginBottom: '8px' }}>Executive HR Dashboard</h1>
           <p style={{ color: 'var(--text-secondary)' }}>AI-powered workforce intelligence overview.</p>
         </div>
-        <button className="btn-primary" style={{ width: 'auto' }}>Generate Report</button>
+        <button onClick={handleGenerateTrends} className="btn-primary" style={{ width: 'auto' }} disabled={loadingTrends}>
+          {loadingTrends ? "Generating..." : "Generate Trends"}
+        </button>
       </header>
 
       {/* KPI Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '40px' }}>
         {[
-          { title: "Total Employees", value: "1,248", icon: <Users />, color: "#00d2ff" },
-          { title: "Avg Productivity", value: "88%", icon: <TrendingUp />, color: "#34d399" },
-          { title: "Burnout Alerts", value: "12", icon: <AlertCircle />, color: "#ef4444" },
+          { title: "Total Employees", value: stats.totalEmployees.toLocaleString(), icon: <Users />, color: "#00d2ff" },
+          { title: "Avg AI Score", value: `${stats.avgProductivity}%`, icon: <TrendingUp />, color: "#34d399" },
+          { title: "Burnout Alerts", value: stats.burnoutAlerts.toString(), icon: <AlertCircle />, color: "#ef4444" },
           { title: "Project Success", value: "94%", icon: <FileCheck />, color: "#a855f7" }
         ].map((kpi, i) => (
           <div key={i} className="glass-panel" style={{ padding: '24px' }}>
@@ -60,13 +122,20 @@ const HRDashboard = () => {
             <Activity size={20} color="#eab308" /> AI Insights
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ padding: '16px', background: 'rgba(239, 68, 68, 0.1)', borderLeft: '4px solid #ef4444', borderRadius: '4px 12px 12px 4px' }}>
-              <h4 style={{ color: '#ef4444', marginBottom: '8px', fontSize: '14px' }}>High Burnout Risk Detected</h4>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Engineering team in Kashmir showing 15% increase in working hours.</p>
-            </div>
-            <div style={{ padding: '16px', background: 'rgba(52, 211, 153, 0.1)', borderLeft: '4px solid #34d399', borderRadius: '4px 12px 12px 4px' }}>
-              <h4 style={{ color: '#34d399', marginBottom: '8px', fontSize: '14px' }}>Skill Gap Closing</h4>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Recent AWS training program improved cloud deployment speeds by 22%.</p>
+            {stats.burnoutAlerts > 0 ? (
+              <div style={{ padding: '16px', background: 'rgba(239, 68, 68, 0.1)', borderLeft: '4px solid #ef4444', borderRadius: '4px 12px 12px 4px' }}>
+                <h4 style={{ color: '#ef4444', marginBottom: '8px', fontSize: '14px' }}>High Burnout Risk Detected</h4>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{stats.burnoutAlerts} employee(s) showing signs of high burnout risk.</p>
+              </div>
+            ) : (
+              <div style={{ padding: '16px', background: 'rgba(52, 211, 153, 0.1)', borderLeft: '4px solid #34d399', borderRadius: '4px 12px 12px 4px' }}>
+                <h4 style={{ color: '#34d399', marginBottom: '8px', fontSize: '14px' }}>Healthy Workforce</h4>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>No immediate burnout risks detected across the organization.</p>
+              </div>
+            )}
+            <div style={{ padding: '16px', background: 'rgba(58, 123, 213, 0.1)', borderLeft: '4px solid #3a7bd5', borderRadius: '4px 12px 12px 4px' }}>
+              <h4 style={{ color: '#3a7bd5', marginBottom: '8px', fontSize: '14px' }}>Overall Performance</h4>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>The average AI assessment score is {stats.avgProductivity} out of 100.</p>
             </div>
           </div>
         </div>
