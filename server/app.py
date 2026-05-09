@@ -3,10 +3,12 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from supabase import create_client
 import flask
+from flask_cors import CORS
 from routes.EmployeeEvaluation import EmployeeEvaluation
 from routes.GenerateTrends import GenerateTrends
 
 app = flask.Flask(__name__)
+CORS(app)
 
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
